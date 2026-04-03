@@ -1,169 +1,477 @@
-# Developer.Point - Monorepo Setup Guide
+# Backend Docs
 
-Welcome to the **Developer.Point** project! 
+This folder contains the backend code for the application. It is built using Node.js , Express.js and Typescript, and it connects to a MongoDB database to store and retrieve data.
 
-This repository is structured as a **Monorepo** using **NPM Workspaces**. This means that both the frontend and backend applications live in the same repository and share a single root `package.json`, making dependency management, running scripts, and code-sharing incredibly straightforward and efficient.
+## Getting Started
 
-This document serves as the complete, definitive guide to understanding, setting up, and working within this monorepo. **No further knowledge transfer should be required.**
+To get started with the backend, follow these steps:
 
----
-
-## 🏗️ Project Architecture
-
-We are using **NPM Workspaces** to manage multiple packages within a single top-level root package. 
-
-### Why NPM Workspaces?
-- **Single `npm install`:** Running install at the root installs dependencies for all sub-projects (frontend and backend) automatically.
-- **Hoisting:** Common dependencies are hoisted to the root `node_modules` folder, saving significant disk space and installation time.
-- **Shared Scripts:** We can trigger scripts across all workspaces from the root directory without navigating into specific folders.
-
-### Directory Structure
-
-```text
-Developer.Point/
-│
-├── frontend/               # React (Vite) Frontend Application
-│   ├── package.json        
-│   └── ... (frontend code)
-│
-├── backend/                # Node.js/Express Backend Application
-│   ├── package.json        
-│   └── ... (backend code)
-│
-├── package.json            # 🌟 ROOT Configuration & Workspace Manager
-├── package-lock.json       # Single lock file for the entire monorepo
-└── README.md               # You are here
-```
-
----
-
-## 🚀 Getting Started (Initial Setup)
-
-If you have just cloned the repository, setting up the project is extremely simple.
-
-### Prerequisites
-Make sure you have Node.js and npm installed on your machine.
-- Node.js (v18 or higher recommended)
-- npm (v8 or higher recommended, as workspaces are built-in from v7+)
-
-### 1. Install Everything
-Do **not** `cd` into the frontend or backend folders to install packages. Run everything from the root folder.
+1. Clone the repository and navigate to the backend folder:
 
 ```bash
-# Make sure you are in the root directory: /Developer.Point
-npm install
+git clone https://github.com/SangeetaSharma73/Developer.Point
+cd backend
 ```
-*This single command will intelligently resolve and install all dependencies for the root, frontend, and backend simultaneously.*
 
-### 2. Start the Development Servers
-We use `concurrently` to run both the frontend and backend development servers side-by-side in the same terminal window.
+1. Create Project
 
 ```bash
-# To run both Frontend & Backend at the same time:
+ mkdir backend
+ cd backend
+ npm init -y
+```
+
+2. Install Dependencies
+
+- Runtime dependencies
+
+```bash
+   npm install express
+```
+
+- Dev dependencies
+
+```bash
+   npm install -D typescript ts-node-dev @types/node @types/express
+   npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+   npm install -D prettier eslint-config-prettier eslint-plugin-prettier
+```
+
+3. Initialize TypeScript
+
+```bash
+   npx tsc --init
+```
+
+Now modify tsconfig.json
+
+```bash
+{
+"compilerOptions": {
+"target": "ES2020",
+"module": "commonjs",
+"rootDir": "./src",
+"outDir": "./dist",
+"esModuleInterop": true,
+"strict": true,
+"skipLibCheck": true
+}
+}
+```
+
+4. Create Project Folder Structure
+   Create folders.
+
+```bash
+node-backend
+│
+├── src
+│ ├── app.ts
+│ ├── server.ts
+│ │
+│ ├── routes
+│ │ └── index.ts
+│ │
+│ ├── controllers
+│ │ └── health.controller.ts
+│ │
+│ ├── services
+│ │
+│ ├── middleware
+│ │
+│ ├── utils
+│ │
+│ └── config
+│ └── env.ts
+│
+├── .eslintrc.js
+├── .prettierrc
+├── .eslintignore
+├── .prettierignore
+├── package.json
+└── tsconfig.json
+```
+
+This structure is scalable and used in production APIs.
+
+5. Create Express App
+   src/app.ts
+
+```bash
+   import express from "express";
+   import routes from "./routes";
+   const app = express();
+    app.use(express.json());
+    app.use("/api", routes);
+
+    export default app;
+```
+
+6.  Create Server File
+    src/server.ts
+
+```bash
+    import app from "./app";
+    const PORT = 5000;
+    app.listen(PORT, () => {
+console.log(`Server running on port ${PORT}`);
+});
+```
+
+7.  Create Routes
+
+src/routes/index.ts
+
+```bash
+    import { Router } from "express";
+    import { healthCheck } from "../controllers/health.controller";
+    const router = Router();
+    router.get("/health", healthCheck);
+    export default router;
+```
+
+8. Create Controller
+   src/controllers/health.controller.ts
+
+```bash
+import { Request, Response } from "express";
+
+export const healthCheck = (req: Request, res: Response) => {
+res.json({
+message: "Server is running"
+});
+};
+```
+
+9. Setup Live Reload
+   Use ts-node-dev.
+
+Add scripts in package.json
+
+```bash
+"scripts": {
+"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+"build": "tsc",
+"start": "node dist/server.js"
+}
+```
+
+Run project
+
+```bash
 npm run dev
 ```
 
----
+Now any code change will auto reload server.
 
-## 📦 Managing Dependencies (Adding/Removing Packages)
+10. Configure ESLint
+    Create file.
 
-A key benefit of our setup is managing dependencies directly from the root folder. We have created custom shorthand scripts to make this effortless.
-
-Always run these commands from the **root directory (`/Developer.Point`)**.
-
-### For the Frontend (`/frontend`)
-
-*   **Add a package:**
-    ```bash
-    npm run f:add <package-name>
-    ```
-    *Example: `npm run f:add axios` (Installs axios inside the frontend workspace)*
-
-*   **Remove a package:**
-    ```bash
-    npm run f:remove <package-name>
-    ```
-    *Example: `npm run f:remove lodash`*
-
-### For the Backend (`/backend`)
-
-*   **Add a package:**
-    ```bash
-    npm run b:add <package-name>
-    ```
-    *Example: `npm run b:add mongoose` (Installs mongoose inside the backend workspace)*
-
-*   **Remove a package:**
-    ```bash
-    npm run b:remove <package-name>
-    ```
-    *Example: `npm run b:remove express`*
-
-### For the Entire Monorepo (Root)
-If you need a tool that is used across the entire repo (like `concurrently`, `eslint`, or `prettier`), you install it at the root as a dev dependency:
+.eslintrc.js
 
 ```bash
-npm install <package-name> -D
+module.exports = {
+parser: "@typescript-eslint/parser",
+parserOptions: {
+ecmaVersion: "latest",
+sourceType: "module"
+},
+plugins: ["@typescript-eslint", "prettier"],
+extends: [
+"eslint:recommended",
+"plugin:@typescript-eslint/recommended",
+"plugin:prettier/recommended"
+],
+rules: {
+"prettier/prettier": "error"
+}
+};
 ```
 
----
+11. Configure Prettier
+    .prettierrc
 
-## 🛠️ Running Workspace-Specific Scripts
+```JSON
+{
+"semi": true,
+"singleQuote": true,
+"trailingComma": "none",
+"printWidth": 80
+}
+```
 
-Sometimes you only want to run a script belonging to a specific workspace (e.g., you only want to build the frontend, or run linting on the backend). 
+12. Ignore Files
 
-You can execute arbitrary scripts inside a specific workspace from the root using the `-w` (workspace) flag. We have set up shorthands for this as well:
-
-*   **Run a Frontend script:**
-    ```bash
-    npm run f <script-name>
-    ```
-    *Example: `npm run f lint` (Executes the "lint" script defined in `frontend/package.json`)*
-
-*   **Run a Backend script:**
-    ```bash
-    npm run b <script-name>
-    ```
-    *Example: `npm run b build` (Executes the "build" script defined in `backend/package.json`)*
-
----
-
-## 🏗️ Building for Production
-
-To create production builds for both the frontend and backend sequentially, run:
+- .eslintignore
 
 ```bash
-npm run build:all
+    node_modules
+    dist
 ```
-This command ensures both parts of the application are compiled and ready for deployment.
 
----
+- .prettierignore
 
-## 📚 Complete Dictionary of Root Scripts
+```bash
+    node_modules
+    dist
+```
 
-Here is a quick reference of every command available in the root `package.json`:
+13. Add Lint Scripts
+    Update package.json
 
-| Command | Description | What it does under the hood |
-| :--- | :--- | :--- |
-| `npm run dev` | **[Main Command]** Starts both Frontend & Backend | `concurrently "npm run dev --prefix frontend" "npm run server --prefix backend"` |
-| `npm install` | Installs all dependencies across the monorepo | Standard `npm install` (Workspaces active) |
-| `npm run build:all` | Builds both frontend and backend | `npm run build --prefix frontend && npm run build --prefix backend` |
-| `npm run f:add <pkg>` | Installs a package in the frontend | `npm install -w frontend <pkg>` |
-| `npm run b:add <pkg>` | Installs a package in the backend | `npm install -w backend <pkg>` |
-| `npm run f:remove <pkg>`| Uninstalls a package from frontend | `npm uninstall -w frontend <pkg>` |
-| `npm run b:remove <pkg>`| Uninstalls a package from backend | `npm uninstall -w backend <pkg>` |
-| `npm run f <cmd>` | Runs a specific script in frontend | `npm run -w frontend <cmd>` |
-| `npm run b <cmd>` | Runs a specific script in backend | `npm run -w backend <cmd>` |
+```bash
+"scripts": {
+"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+"build": "tsc",
+"start": "node dist/server.js",
+"lint": "eslint . --ext .ts",
+"lint:fix": "eslint . --ext .ts --fix"
+}
+```
 
----
+Run lint
 
-## 💡 Troubleshooting & Best Practices
+```bash
+npm run lint
+```
 
-1. **NEVER run `npm install` inside the sub-directories** (`/frontend` or `/backend`). This creates separate `package-lock.json` files and defeats the purpose of the monorepo hoisting. Always manage dependencies from the root.
-2. **If dependencies feel broken or out of sync:**
-   - Delete the root `node_modules` folder.
-   - Delete the `node_modules` folders inside `/frontend` and `/backend` (if you accidentally created them).
-   - Delete the `package-lock.json` at the root.
-   - Run `npm install` from the root again to generate a fresh, clean lockfile.
-3. **The Backend uses TS-Node-Dev & Mongoose/Express.** (Started via `npm run server` within its package.json).
-4. **The Frontend uses React with Vite.** (Started via `npm run dev` within its package.json).
+Auto fix
+
+```bash
+npm run lint:fix
+```
+
+14. Optional (Recommended for Enterprise)
+    Install environment config.
+
+```bash
+npm install dotenv
+```
+
+src/config/env.ts
+
+```bash
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export const PORT = process.env.PORT || 5000;
+```
+
+15. Run the Project
+
+```
+npm run dev
+```
+
+Test API
+
+```bash
+GET http://localhost:5000/api/health
+```
+
+Response
+
+```bash
+{
+"message": "Server is running"
+}
+```
+
+16. MongoDB Connection
+
+1️⃣ Install Required Packages
+Run this in your project:
+
+```bash
+npm install mongoose dotenv
+npm install -D @types/node
+```
+
+Docs:
+https://mongoosejs.com/docs/connections.html
+
+2️⃣ Create Environment File
+
+Create a .env file in the root:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/mydatabase
+```
+
+If using cloud DB like MongoDB Atlas, the URI will be different.
+
+Docs:
+https://www.mongodb.com/docs/atlas/
+
+3️⃣ Create Database Config Folder
+
+Folder structure example:
+
+```txt
+src
+ ├── config
+ │    └── db.ts
+ ├── routes
+ ├── controllers
+ ├── app.ts
+ └── server.ts
+```
+
+4️⃣ Write DB Connection Code
+
+Create:
+
+```txt
+src/config/db.ts
+```
+
+5️⃣ Load Environment Variables
+
+Install dotenv (if not already):
+
+```bash
+npm install dotenv
+```
+
+6️⃣ Use DB Connection in server.ts
+7️⃣ Run the project
+
+17. Todo API Creation
+
+1️⃣ Todo Model : I have created a simple todo model to demonstrate how to create a model , define the schema of the model and connect it to the database.
+
+src/models/todo.model.ts
+
+2️⃣ Create services to handle the business logic of the application.
+
+src/services/todo.service.ts
+
+3️⃣ Create controllers to handle the incoming requests and send responses.
+
+src/controllers/todo.controller.ts
+
+4️⃣ Create routes to define the endpoint of the app.
+
+src/routes/todo.routes.ts
+
+5️⃣Validate the incoming request data using middleware and validations.
+
+src/middleware/validation.middleware.ts
+
+6️⃣ Handle errors using error handling middleware.
+
+src/middleware/error.middleware.ts
+
+7️⃣ Connect the routes to the app.
+
+src/app.ts
+
+18. Auth API Creation
+
+1️⃣ Model (Database layer)
+
+- src/models/user.model.ts
+- Define schema, structure, DB connection
+
+2️⃣ Utilities
+
+- src/utils/jwt.util.ts
+- Helper functions like token generation/verification
+
+3️⃣ Services (Business logic)
+
+- src/services/auth.service.ts
+- Talks to model + handles logic (login, signup, etc.)
+
+4️⃣ Controllers (Request/Response layer)
+
+- src/controllers/auth.controller.ts
+- Calls services, returns response
+
+5️⃣ Middleware
+
+- validation.middleware.ts
+- auth.middleware.ts
+- error.middleware.ts
+
+6️⃣ Routes
+
+- src/routes/auth.routes.ts
+- Connect endpoints to controllers + middleware
+
+7️⃣ App entry
+
+- src/app.ts
+- Register routes, middleware, start server
+
+8️⃣ Actual Runtime Flow (VERY IMPORTANT)
+
+When a request hits your server, this is the real flow:
+
+```txt
+Client Request
+   ↓
+app.ts
+   ↓
+Routes (auth.routes.ts)
+   ↓
+Middleware (validation / auth)
+   ↓
+Controller (auth.controller.ts)
+   ↓
+Service (auth.service.ts)
+   ↓
+Model (user.model.ts) / Database
+   ↓
+Service
+   ↓
+Controller
+   ↓
+Response to Client
+```
+
+18. Signup with Google OAuth
+
+1️⃣ Install Required Packages
+
+```bash
+npm install passport passport-google-oauth20 express-session
+npm install -D @types/passport @types/passport-google-oauth20 @types/express-session
+```
+
+2️⃣ Configure Passport
+
+src/config/passport.ts
+
+3️⃣ Create Auth Routes
+
+src/routes/auth.routes.ts
+
+4️⃣ Create Auth Controller
+
+src/controllers/auth.controller.ts
+
+5️⃣ Create User Model ( if not already created)
+
+src/models/user.model.ts
+
+6️⃣ Update App.ts
+
+src/app.ts
+
+7️⃣ Run the Project
+
+```bash
+npm run dev
+```
+
+8️⃣ Test the Flow
+Open in browser:
+
+```
+http://localhost:5000/api/auth/google
+```
+
+This will redirect you to Google for authentication. After successful login, it will redirect back to your app with user info.
