@@ -1,10 +1,11 @@
-import express from 'express';
-import routes from './routes';
-import todoRoutes from './routes/todo.route';
-import authRoutes from './routes/auth.route';
-import { errorMiddleware } from './middleware/error.middleware';
-import passport from 'passport';
 import dotenv from 'dotenv';
+import express from 'express';
+import passport from 'passport';
+
+import { errorMiddleware } from './middleware/error.middleware';
+import authRoutes from './routes/auth.route';
+import routes from './routes/index';
+import todoRoutes from './routes/todo.route';
 dotenv.config();
 
 import './config/passport'; // just execute file
@@ -18,8 +19,8 @@ app.use('/api/todos', todoRoutes);
 
 app.use('/api/auth', authRoutes);
 
-app.get('/', () => {
-  console.log('Api is working ...');
+app.get('/', (_req, res): void => {
+  res.send('Api is working ...');
 });
 
 // ✅ Error middleware MUST be last

@@ -1,12 +1,9 @@
 import bcrypt from 'bcryptjs';
+
 import User from '../models/user.model';
 import { generateToken } from '../utils/generateToken';
 
-export const signupService = async (
-  name: string,
-  email: string,
-  password: string
-) => {
+export const signupService = async (name: string, email: string, password: string): Promise<{ user: unknown; token: string }> => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -26,7 +23,7 @@ export const signupService = async (
   return { user, token };
 };
 
-export const loginService = async (email: string, password: string) => {
+export const loginService = async (email: string, password: string): Promise<{ user: unknown; token: string }> => {
   const user = await User.findOne({ email });
 
   if (!user || !user.password) {

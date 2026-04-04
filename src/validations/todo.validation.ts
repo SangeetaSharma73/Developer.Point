@@ -7,8 +7,5 @@ export const todoSchema = z.object({
   completed: z.boolean().optional().default(false),
   priority: z.enum(['low', 'medium', 'hard']),
 
-  dueDate: z.preprocess(
-    (val) => (val ? new Date(val as string) : undefined),
-    z.date().optional()
-  )
+  dueDate: z.preprocess((val) => (val ? new Date(val as string) : undefined), z.date().optional())
 });

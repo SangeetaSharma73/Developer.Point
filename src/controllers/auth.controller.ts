@@ -1,11 +1,8 @@
-import { signupService, loginService } from '../services/auth.service';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-export const signup = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+import { loginService, signupService } from '../services/auth.service';
+
+export const signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { name, email, password } = req.body;
     const data = await signupService(name, email, password);
@@ -15,11 +12,7 @@ export const signup = async (
   }
 };
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { email, password } = req.body;
     const data = await loginService(email, password);
@@ -30,7 +23,7 @@ export const login = async (
 };
 
 //JWT logout is handled on frontend.
-export const logout = (req: Request, res: Response) => {
+export const logout = (req: Request, res: Response): void => {
   res.json({ message: 'Logout successful' });
 };
 //Frontend simply deletes token.

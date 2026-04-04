@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-export const healthCheck = (req: Request, res: Response) => {
+export const healthCheck = (_req: Request, res: Response): void => {
   res.json({
-    message: "Server is running",
+    message: 'Server is running'
   });
 };
