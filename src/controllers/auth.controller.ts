@@ -1,11 +1,8 @@
-import { signupService, loginService } from '../services/auth.service';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-export const signup = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+import { loginService, signupService } from '../services/auth.service';
+
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, email, password } = req.body;
     const data = await signupService(name, email, password);
@@ -15,11 +12,7 @@ export const signup = async (
   }
 };
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
     const data = await loginService(email, password);

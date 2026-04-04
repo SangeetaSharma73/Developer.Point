@@ -1,10 +1,11 @@
-import express from 'express';
-import routes from './routes';
-import todoRoutes from './routes/todo.route';
-import authRoutes from './routes/auth.route';
-import { errorMiddleware } from './middleware/error.middleware';
-import passport from 'passport';
 import dotenv from 'dotenv';
+import express from 'express';
+import passport from 'passport';
+
+import { errorMiddleware } from './middleware/error.middleware';
+import routes from './routes';
+import authRoutes from './routes/auth.route';
+import todoRoutes from './routes/todo.route';
 dotenv.config();
 
 import './config/passport'; // just execute file

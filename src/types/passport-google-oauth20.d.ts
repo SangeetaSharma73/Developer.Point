@@ -4,12 +4,7 @@ declare module 'passport-google-oauth20' {
   export class Strategy extends PassportStrategy {
     constructor(
       options: any,
-      verify: (
-        accessToken: string,
-        refreshToken: string,
-        profile: any,
-        done: Function
-      ) => void
+      verify: (accessToken: string, refreshToken: string, profile: any, done: Function) => void
     );
   }
 }

@@ -1,7 +1,8 @@
 import { Router } from 'express';
+
 import * as todoController from '../controllers/todo.controller';
-import { todoSchema } from '../validations/todo.validation';
 import { validate } from '../middleware/validate.middleware';
+import { todoSchema } from '../validations/todo.validation';
 const router = Router();
 
 router.post('/', validate(todoSchema), todoController.createTodo);

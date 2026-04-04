@@ -1,12 +1,9 @@
 import bcrypt from 'bcryptjs';
+
 import User from '../models/user.model';
 import { generateToken } from '../utils/generateToken';
 
-export const signupService = async (
-  name: string,
-  email: string,
-  password: string
-) => {
+export const signupService = async (name: string, email: string, password: string) => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
