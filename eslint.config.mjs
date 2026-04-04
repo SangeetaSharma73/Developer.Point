@@ -22,11 +22,22 @@ export default defineConfig([
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
+        tsconfigRootDir: import.meta.dirname
       },
       globals: {
         ...globals.node,
         ...globals.es2021
+      }
+    },
+
+    settings: {
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx']
+        }
+      },
+      n: {
+        tryExtensions: ['.js', '.ts', '.json']
       }
     },
 
@@ -57,7 +68,7 @@ export default defineConfig([
       'no-useless-return': 'error',
 
       // Logging / debugging
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'error',
 
       // Complexity
@@ -72,7 +83,6 @@ export default defineConfig([
       // Import hygiene
       'import/no-unresolved': 'error',
       'import/no-duplicates': 'error',
-      'import/order': ['warn', { 'newlines-between': 'always' }],
 
       // Promise / async safety
       'no-async-promise-executor': 'error',
